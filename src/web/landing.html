@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask My Docs — Enter</title>
+    <meta name="description" content="Production RAG System — Explore, Retrieve, Understand.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Inter', sans-serif;
+            color: #f1f5f9;
+        }
+
+        /* ===== Full-screen Background Image ===== */
+        .bg-image {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            background: url('/static/landing-bg.png') center center / cover no-repeat;
+            filter: brightness(0.7);
+        }
+
+        /* Dark overlay for text readability */
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background:
+                radial-gradient(ellipse 70% 60% at 50% 45%, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.7) 100%),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, transparent 30%, transparent 70%, rgba(0, 0, 0, 0.5) 100%);
+        }
+
+        /* Subtle green glow overlay matching the door */
+        .glow-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            background:
+                radial-gradient(ellipse 20% 60% at 50% 55%, rgba(16, 185, 129, 0.06) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        /* Vignette */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            z-index: 3;
+            background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.6) 100%);
+            pointer-events: none;
+        }
+
+        /* ===== Content ===== */
+        .landing {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        /* Small badge / logo area (like the Sprite x Wakanda logos) */
+        .badge-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            animation: fadeInDown 1s ease-out 0.2s both;
+        }
+
+        .badge-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .badge-separator {
+            width: 1px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .badge-text {
+            font-size: 0.6rem;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+            line-height: 1.5;
+        }
+
+        /* ===== Title — matching "HALL OF ZERO LIMITS" layout ===== */
+        .title-group {
+            animation: fadeInUp 1.2s ease-out 0.4s both;
+            margin-bottom: 1.5rem;
+        }
+
+        .title-the {
+            display: block;
+            font-family: 'Cinzel', serif;
+            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+            font-weight: 400;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.3rem;
+        }
+
+        .title-main {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 900;
+            line-height: 0.9;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.92);
+            text-shadow:
+                0 0 80px rgba(16, 185, 129, 0.15),
+                0 0 40px rgba(16, 185, 129, 0.08),
+                0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .title-of {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 300;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.45);
+            display: inline-block;
+            vertical-align: top;
+            margin: 0 0.3em;
+            position: relative;
+            top: 0.15em;
+        }
+
+        .title-line-1 {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .title-line-2 {
+            display: block;
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 7vw, 5rem);
+            font-weight: 900;
+            line-height: 0.95;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.95);
+            text-shadow:
+                0 0 120px rgba(16, 185, 129, 0.12),
+                0 0 60px rgba(16, 185, 129, 0.06),
+                0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Decorative ornament lines (small details beside title) */
+        .ornament {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 0.75rem 0;
+            animation: fadeInUp 1s ease-out 0.6s both;
+        }
+
+        .ornament-line {
+            width: 60px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3), transparent);
+        }
+
+        .ornament-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.5);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Subtitle */
+        .subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(0.75rem, 1.5vw, 0.95rem);
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.45);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            line-height: 1.8;
+            margin-bottom: 3rem;
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+
+        /* ===== ENTER Button — matching the reference exactly ===== */
+        .enter-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 2.5rem;
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            border-radius: 4px;
+            color: rgba(16, 185, 129, 0.9);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 1s ease-out 1s both;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .enter-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            box-shadow:
+                0 0 15px rgba(16, 185, 129, 0.15),
+                inset 0 0 15px rgba(16, 185, 129, 0.05);
+            opacity: 0.5;
+            transition: opacity 0.4s;
+        }
+
+        .enter-btn:hover {
+            border-color: rgba(16, 185, 129, 0.6);
+            color: rgba(16, 185, 129, 1);
+            background: rgba(16, 185, 129, 0.1);
+            box-shadow:
+                0 0 40px rgba(16, 185, 129, 0.2),
+                0 0 80px rgba(16, 185, 129, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .enter-btn:hover::before {
+            opacity: 1;
+        }
+
+        .enter-btn:hover::after {
+            opacity: 1;
+        }
+
+        .enter-btn:active {
+            transform: translateY(0);
+        }
+
+        .enter-btn-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .enter-arrows {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s;
+            font-size: 0.9em;
+        }
+
+        .enter-btn:hover .enter-arrows {
+            transform: translateX(4px);
+        }
+
+        /* Press Enter hint */
+        .hint {
+            position: absolute;
+            bottom: 2.5rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.18);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            animation: fadeInUp 1s ease-out 1.4s both;
+        }
+
+        .hint kbd {
+            display: inline-block;
+            padding: 0.12rem 0.4rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.6rem;
+            margin: 0 0.15rem;
+        }
+
+        /* Corner decorations (like the reference has small text in corners) */
+        .corner-text {
+            position: fixed;
+            font-size: 0.55rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.12);
+            font-family: 'Inter', sans-serif;
+            z-index: 10;
+        }
+
+        .corner-tl {
+            top: 1.5rem;
+            left: 1.5rem;
+        }
+
+        .corner-tr {
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        .corner-bl {
+            bottom: 1.5rem;
+            left: 1.5rem;
+        }
+
+        .corner-br {
+            bottom: 1.5rem;
+            right: 1.5rem;
+        }
+
+        /* Green status dot */
+        .status-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .live-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.8);
+            box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+            animation: livePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        /* ===== Animations ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Exit transition */
+        .landing.exit {
+            animation: zoomFadeOut 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes zoomFadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0) brightness(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.08);
+                filter: blur(12px) brightness(1.5);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .corner-text {
+                display: none;
+            }
+
+            .ornament-line {
+                width: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Background Image -->
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
+    <div class="glow-overlay"></div>
+    <div class="vignette"></div>
+
+    <!-- Corner decorations -->
+    <span class="corner-text corner-tl">RETR — </span>
+    <span class="corner-text corner-tr">
+        <span class="status-live"><span class="live-dot"></span> Production RAG</span>
+    </span>
+    <span class="corner-text corner-bl">v1.0.0</span>
+    <span class="corner-text corner-br">Hybrid Retrieval System</span>
+
+    <!-- Content -->
+    <div class="landing" id="landing">
+        <!-- Top badge area -->
+        <div class="badge-area">
+            <div class="badge-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                    <path d="M8 9h8M8 13h6" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="badge-separator"></div>
+            <div class="badge-text">
+                Powered by<br>Hybrid RAG
+            </div>
+        </div>
+
+        <!-- Main Title -->
+        <div class="title-group">
+            <span class="title-the">The</span>
+            <div class="title-line-1">
+                <span class="title-main">ASK</span>
+                <span class="title-of">my</span>
+            </div>
+            <span class="title-line-2">DOCS</span>
+        </div>
+
+        <!-- Ornament -->
+        <div class="ornament">
+            <div class="ornament-line"></div>
+            <div class="ornament-dot"></div>
+            <div class="ornament-line"></div>
+        </div>
+
+        <!-- Subtitle -->
+        <p class="subtitle">
+            Explore new paths.<br>
+            Find your answer.
+        </p>
+
+        <!-- Enter Button -->
+        <a href="/app" class="enter-btn" id="enterBtn">
+            <span class="enter-btn-text">ENTER</span>
+            <span class="enter-arrows">&raquo;</span>
+        </a>
+
+        <!-- Hint -->
+        <p class="hint">Press <kbd>Enter</kbd> to continue</p>
+    </div>
+
+    <script>
+        function enterApp(e) {
+            if (e) e.preventDefault();
+            const landing = document.getElementById('landing');
+            landing.classList.add('exit');
+            setTimeout(() => { window.location.href = '/app'; }, 700);
+        }
+
+        // Click
+        document.getElementById('enterBtn').addEventListener('click', enterApp);
+
+        // Enter key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') enterApp(e);
+        });
+    </script>
+</body>
+
+</html>

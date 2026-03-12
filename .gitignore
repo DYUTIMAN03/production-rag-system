@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables
+.env
+
+# ChromaDB
+chroma_db/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Evaluation reports
+evaluation_report*.json
+
+# Langfuse data
+langfuse_data/
+postgres_data/
+clickhouse_data/
+
+# BM25 index cache
+*.pkl
+
+# Cache
+.cache/
+.pytest_cache/
+
+# Database
+feedback.db
+
+# Tool configs
+.gemini/
+.agents/

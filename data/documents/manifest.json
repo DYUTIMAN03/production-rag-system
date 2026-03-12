@@ -1,0 +1,22 @@
+{
+  "chromadb": [
+    {
+      "url": "https://docs.trychroma.com/docs/cli/browse",
+      "title": "Browse Collections - Chroma Docs",
+      "filepath": "C:\\Users\\ASUS\\Desktop\\RAG\\data\\documents\\chromadb\\cli_browse.md",
+      "chars": 4159
+    },
+    {
+      "url": "https://docs.trychroma.com/docs/cli/copy",
+      "title": "Copy Collections - Chroma Docs",
+      "filepath": "C:\\Users\\ASUS\\Desktop\\RAG\\data\\documents\\chromadb\\cli_copy.md",
+      "chars": 3831
+    },
+    {
+      "url": "https://docs.trychroma.com/docs/cli/db",
+      "title": "DB Management - Chroma Docs",
+      "filepath": "C:\\Users\\ASUS\\Desktop\\RAG\\data\\documents\\chromadb\\cli_db.md",
+      "chars": 3694
+    }
+  ]
+}

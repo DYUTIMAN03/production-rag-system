@@ -1,0 +1,59 @@
+name: RAG Evaluation Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'config/**'
+      - 'requirements.txt'
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run evaluation
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: |
+          python -m src.evaluation.evaluate \
+            --dataset src/evaluation/golden_dataset.json \
+            --output evaluation_report.json
+
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evaluation-report
+          path: evaluation_report.json
+
+      - name: Check evaluation results
+        run: |
+          python -c "
+          import json, sys
+          with open('evaluation_report.json') as f:
+              report = json.load(f)
+          if not report['overall_passed']:
+              print('❌ Evaluation FAILED')
+              for m, r in report['threshold_results'].items():
+                  status = '✓' if r['passed'] else '✗'
+                  print(f'  {status} {m}: {r[\"score\"]:.4f} (threshold: {r[\"threshold\"]})')
+              sys.exit(1)
+          print('✅ Evaluation PASSED')
+          for m, r in report['threshold_results'].items():
+              print(f'  ✓ {m}: {r[\"score\"]:.4f} (threshold: {r[\"threshold\"]})')
+          "

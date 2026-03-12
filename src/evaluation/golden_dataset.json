@@ -1,0 +1,179 @@
+[
+  {
+    "question": "What is the difference between supervised and unsupervised learning?",
+    "ground_truth_answer": "Supervised learning uses labeled training data where each input is paired with a desired output, learning a mapping function to generalize to new data. Common tasks include classification and regression. Unsupervised learning works with unlabeled data, finding hidden structure and patterns without being told what to look for. Common tasks include clustering, dimensionality reduction, and anomaly detection.",
+    "source_documents": [
+      "machine_learning_fundamentals.md"
+    ]
+  },
+  {
+    "question": "What is overfitting and how can it be prevented?",
+    "ground_truth_answer": "Overfitting occurs when a model learns the training data too well, including noise, resulting in poor generalization to new data. Signs include high training accuracy but low validation accuracy. Mitigation strategies include regularization (L1/L2), dropout, early stopping, cross-validation, and collecting more training data. The bias-variance tradeoff is the fundamental tension — simple models underfit while complex models overfit.",
+    "source_documents": [
+      "machine_learning_fundamentals.md"
+    ]
+  },
+  {
+    "question": "How does the transformer self-attention mechanism work?",
+    "ground_truth_answer": "Self-attention allows each token to attend to every other token by computing a weighted sum based on relevance. It uses three learned projections: Query (what the token is looking for), Key (what each token offers), and Value (the actual information). The attention score is computed as softmax(QK^T / sqrt(d_k)) × V. The division by sqrt(d_k) prevents dot products from becoming too large. Multi-head attention runs multiple attention operations in parallel to capture different types of relationships.",
+    "source_documents": [
+      "large_language_models.md"
+    ]
+  },
+  {
+    "question": "What is RLHF and why is it important for LLMs?",
+    "ground_truth_answer": "RLHF (Reinforcement Learning from Human Feedback) aligns LLMs with human preferences through three steps: collecting human comparisons of model outputs, training a reward model to predict human preferences, and optimizing the language model using PPO to maximize the reward while staying close to the SFT model via KL divergence penalty. RLHF was instrumental in making ChatGPT more helpful and less harmful than base GPT-3.",
+    "source_documents": [
+      "large_language_models.md"
+    ]
+  },
+  {
+    "question": "What is LoRA and how does it enable efficient fine-tuning?",
+    "ground_truth_answer": "LoRA (Low-Rank Adaptation) decomposes weight updates into low-rank matrices (A × B), training only these small matrices while freezing the original weights. It typically adds only 0.1-1% additional parameters. QLoRA extends this by quantizing the base model to 4-bit, enabling fine-tuning of 65B models on a single 48GB GPU. This is a parameter-efficient fine-tuning (PEFT) method that makes adapting large models practical.",
+    "source_documents": [
+      "large_language_models.md"
+    ]
+  },
+  {
+    "question": "What are the key differences between GPT and BERT?",
+    "ground_truth_answer": "GPT uses causal language modeling (predicting the next token left-to-right) and is designed for text generation. BERT uses masked language modeling (predicting randomly masked tokens using bidirectional context) and is designed for understanding tasks like classification and NER. GPT processes text unidirectionally while BERT processes it bidirectionally. GPT-series models are decoder-only transformers while BERT is an encoder-only transformer.",
+    "source_documents": [
+      "large_language_models.md"
+    ]
+  },
+  {
+    "question": "How does batch normalization work and why is it useful?",
+    "ground_truth_answer": "Batch normalization normalizes the inputs to each layer by adjusting and scaling activations. It stabilizes and accelerates training by reducing internal covariate shift. It also acts as a mild regularizer. Batch normalization computes the mean and variance across the batch dimension, normalizes the activations, and then applies learnable scale and shift parameters.",
+    "source_documents": [
+      "deep_learning_neural_networks.md"
+    ]
+  },
+  {
+    "question": "What is the difference between CNNs and RNNs?",
+    "ground_truth_answer": "CNNs are specialized for grid-structured data (primarily images) and exploit spatial locality through convolutional operations. They use learnable filters that slide across input to detect patterns. RNNs are designed for sequential data where order matters (text, time series) and maintain a hidden state that captures information from previous time steps. CNNs process all spatial locations in parallel, while RNNs process sequences step by step (though modern architectures like transformers have largely replaced RNNs).",
+    "source_documents": [
+      "deep_learning_neural_networks.md"
+    ]
+  },
+  {
+    "question": "What is transfer learning and why is it important?",
+    "ground_truth_answer": "Transfer learning leverages knowledge from a model trained on a large dataset and applies it to a different but related task, even with limited data. Common approaches include feature extraction (using the pretrained model as a fixed feature extractor) and fine-tuning (unfreezing some layers and training with a low learning rate). It's one of the most practically important techniques in deep learning because it enables high accuracy even when labeled data is scarce.",
+    "source_documents": [
+      "deep_learning_neural_networks.md"
+    ]
+  },
+  {
+    "question": "How does RAG work and why is it better than using LLMs alone?",
+    "ground_truth_answer": "RAG (Retrieval-Augmented Generation) combines information retrieval with LLM generation. The pipeline involves document chunking, embedding, indexing in a vector database, retrieval of relevant chunks for a query, and generation with the retrieved context. RAG is better than LLMs alone because it grounds responses in factual evidence, enables access to up-to-date information, reduces hallucination, and allows knowledge updates without retraining the model.",
+    "source_documents": [
+      "nlp_and_ai_applications.md",
+      "rag_technical_guide.md"
+    ]
+  },
+  {
+    "question": "What is chain-of-thought prompting?",
+    "ground_truth_answer": "Chain-of-thought (CoT) prompting instructs the model to break down its reasoning into explicit intermediate steps before arriving at an answer. This dramatically improves performance on arithmetic, commonsense reasoning, and symbolic reasoning tasks. It can be elicited by adding 'Let's think step by step' or by providing examples with detailed reasoning chains.",
+    "source_documents": [
+      "large_language_models.md"
+    ]
+  },
+  {
+    "question": "What are diffusion models and how do they generate images?",
+    "ground_truth_answer": "Diffusion models generate data by learning to reverse a noise-adding process. During training, noise is progressively added to data. The model learns to denoise, allowing generation of new samples by starting from pure noise and iteratively denoising. Stable Diffusion operates in a compressed latent space for efficiency. DALL-E generates images from text descriptions with remarkable creativity.",
+    "source_documents": [
+      "nlp_and_ai_applications.md"
+    ]
+  },
+  {
+    "question": "What is the Chinchilla scaling law?",
+    "ground_truth_answer": "The Chinchilla scaling law (Hoffmann et al., 2022) established that for a given compute budget, model size and training tokens should be scaled equally. This suggested many models like GPT-3 were undertrained — a smaller model trained on more data could achieve better performance with the same compute. Chinchilla (70B parameters, 1.4T tokens) outperformed the larger Gopher (280B parameters, 300B tokens).",
+    "source_documents": [
+      "large_language_models.md"
+    ]
+  },
+  {
+    "question": "What is gradient descent and what are its variants?",
+    "ground_truth_answer": "Gradient descent optimizes the loss function by iteratively updating weights in the direction that reduces the loss. Stochastic Gradient Descent (SGD) uses single samples or small batches and is noisy but can escape local minima. Mini-batch gradient descent uses small batches (32-256 samples). Adam combines momentum with adaptive learning rates and is the most popular optimizer. AdamW decouples weight decay from gradient updates and is standard for training transformers.",
+    "source_documents": [
+      "deep_learning_neural_networks.md"
+    ]
+  },
+  {
+    "question": "What is hybrid search in information retrieval?",
+    "ground_truth_answer": "Hybrid search combines vector search (semantic/dense retrieval using embeddings) and BM25 keyword search to leverage both approaches. Vector search excels at understanding meaning and intent but struggles with exact keyword matches. BM25 handles specific terms and phrases better. Scores are normalized and combined with configurable weights (typically 60% vector, 40% BM25). This provides better retrieval quality than either method alone.",
+    "source_documents": [
+      "rag_technical_guide.md",
+      "vector_databases_guide.md"
+    ]
+  },
+  {
+    "question": "What are AI agents and how do they work?",
+    "ground_truth_answer": "AI agents use LLMs as their reasoning engine to autonomously plan, execute, and adapt strategies for complex tasks. Unlike chatbots, agents can break down goals into sub-tasks, use external tools (search, code execution, APIs), maintain memory, and self-correct. Key architectures include ReAct (alternating reasoning and acting), Plan-and-Execute (upfront planning), and Tree of Thoughts (exploring multiple paths).",
+    "source_documents": [
+      "nlp_and_ai_applications.md"
+    ]
+  },
+  {
+    "question": "What is quantization in the context of LLMs?",
+    "ground_truth_answer": "Quantization reduces the precision of model weights from 32-bit or 16-bit to lower precision (8-bit, 4-bit, or even 2-bit integers) to reduce memory usage and speed up inference. GPTQ provides post-training quantization to 4-bit with about 1% accuracy loss. AWQ preserves precision for the most important weights. GGUF is a format for CPU inference used by llama.cpp with various quantization levels (Q4_0, Q4_K_M, Q5_K_M, Q8_0).",
+    "source_documents": [
+      "large_language_models.md"
+    ]
+  },
+  {
+    "question": "What is the difference between precision and recall?",
+    "ground_truth_answer": "Precision measures what proportion of positive predictions are actually correct (of all things the model said were positive, how many really were). Recall measures what proportion of actual positives were correctly identified (of all things that actually were positive, how many did the model find). Precision is important when false positives are costly, while recall is important when false negatives are costly. F1 score is the harmonic mean of both.",
+    "source_documents": [
+      "machine_learning_fundamentals.md"
+    ]
+  },
+  {
+    "question": "What is cross-encoder re-ranking and why does it improve retrieval?",
+    "ground_truth_answer": "A cross-encoder re-ranker evaluates query-document pairs jointly by processing them together through a transformer, unlike bi-encoders which encode them independently. This joint evaluation allows deep token-level attention between query and document, producing more accurate relevance scores. It consistently and dramatically improves precision. The re-ranker typically reduces candidates from 20 chunks to the top 5 most relevant.",
+    "source_documents": [
+      "rag_technical_guide.md"
+    ]
+  },
+  {
+    "question": "What is the KV cache in LLM inference and how is it optimized?",
+    "ground_truth_answer": "During autoregressive generation, key and value tensors from previous tokens are cached to avoid redundant computation. The KV cache grows linearly with sequence length and batch size, often becoming the memory bottleneck. Optimizations include Multi-Query Attention (MQA) which shares a single KV head across all query heads, and Grouped-Query Attention (GQA) where groups of query heads share KV heads. LLaMA 2 70B uses 8 KV heads for 64 query heads, reducing cache by 8x.",
+    "source_documents": [
+      "large_language_models.md"
+    ]
+  },
+  {
+    "question": "What is ensemble learning?",
+    "ground_truth_answer": "Ensemble methods combine multiple models for better predictions. Bagging (Bootstrap Aggregating) trains models on random subsets with replacement and combines via voting/averaging — Random Forest is the most known example. Boosting trains models sequentially, each focusing on previous mistakes — XGBoost, LightGBM, and CatBoost are popular implementations. Stacking trains diverse base learners and a meta-learner that learns how to combine their predictions.",
+    "source_documents": [
+      "machine_learning_fundamentals.md"
+    ]
+  },
+  {
+    "question": "What is Named Entity Recognition?",
+    "ground_truth_answer": "Named Entity Recognition (NER) identifies and classifies named entities in text — persons, organizations, locations, dates, monetary values. It's a sequence labeling task where each token gets an entity tag. For example, 'Albert Einstein was born in Ulm' would tag 'Albert Einstein' as PERSON, 'Ulm' as LOCATION. NER models typically use the BIO tagging scheme: B-PER (beginning), I-PER (inside), O (outside).",
+    "source_documents": [
+      "nlp_and_ai_applications.md"
+    ]
+  },
+  {
+    "question": "How does Reinforcement Learning differ from supervised learning?",
+    "ground_truth_answer": "In reinforcement learning, an agent learns by interacting with an environment and receiving rewards or penalties, learning a policy that maximizes cumulative reward over time. Unlike supervised learning which learns from labeled examples, RL learns from trial and error without explicit correct answers. Key concepts include agent, environment, state, action, reward, policy, and value function. RL has achieved superhuman performance in games like Go (AlphaGo) and Chess.",
+    "source_documents": [
+      "machine_learning_fundamentals.md"
+    ]
+  },
+  {
+    "question": "What are Vision Transformers (ViT)?",
+    "ground_truth_answer": "Vision Transformers apply the transformer architecture directly to image patches. An image is split into fixed-size patches (e.g., 16x16), each is linearly embedded, and the resulting sequence is processed by a standard transformer encoder. ViT and variants (DeiT, Swin Transformer, BEiT) have matched or exceeded CNN performance on many vision tasks, showing that the transformer architecture is effective beyond NLP.",
+    "source_documents": [
+      "nlp_and_ai_applications.md"
+    ]
+  },
+  {
+    "question": "What is the difference between HNSW and IVF indexing in vector databases?",
+    "ground_truth_answer": "HNSW (Hierarchical Navigable Small World) builds a multi-layer graph where queries traverse from top layers down, narrowing the search space. It offers excellent query performance with controllable recall-speed tradeoffs. IVF (Inverted File Index) partitions vector space into clusters using k-means and searches only the nearest clusters. IVF is faster to build but requires more careful tuning. HNSW is the most commonly used index type for vector databases.",
+    "source_documents": [
+      "vector_databases_guide.md"
+    ]
+  }
+]

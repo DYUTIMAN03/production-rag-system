@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Oracle — Ask My Docs</title>
+    <meta name="description"
+        content="The Oracle — Production RAG System with hybrid retrieval, citation enforcement, and full observability">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=2">
+    <!-- Marked.js for Markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+
+<body>
+    <!-- Ambient Particle Canvas -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Corner HUD Decorations -->
+    <span class="corner-hud top-left">ORACLE://</span>
+    <span class="corner-hud top-right">▸ HYBRID RAG v1.0</span>
+    <span class="corner-hud bottom-left">RETRIEVAL ACTIVE</span>
+    <span class="corner-hud bottom-right">VECTOR + BM25 + RERANKER</span>
+
+    <!-- 3-Column Mission Control Layout -->
+    <div class="mission-control">
+
+        <!-- LEFT PANEL — Corpus -->
+        <aside class="panel panel-left" id="corpusPanel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span class="panel-glyph">◈</span>
+                    <span>CORPUS</span>
+                </div>
+                <span class="panel-badge" id="corpusCount">—</span>
+            </div>
+            <div class="corpus-list" id="corpusList">
+                <div class="corpus-empty">
+                    <span class="corpus-empty-icon">📁</span>
+                    <span>No documents indexed</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER — Main App -->
+        <div class="app">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-content">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                                <path d="M8 9h8M8 13h6" stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h1>Ask My Docs</h1>
+                            <span class="subtitle">The Oracle — Production RAG</span>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button id="metricsBtn" class="btn btn-ghost" title="Pipeline Metrics">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M18 20V10M12 20V4M6 20v-6" />
+                            </svg>
+                            Metrics
+                        </button>
+                        <div id="statusIndicator" class="status-indicator">
+                            <span class="status-dot"></span>
+                            <span id="statusText">Connecting...</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="main">
+                <!-- Oracle Welcome -->
+                <div class="oracle-welcome" id="oracleWelcome">
+                    <span class="welcome-glyph">◈</span>
+                    <div class="welcome-title">The Oracle Awaits</div>
+                    <div class="welcome-sub">Ask, and the knowledge shall be revealed...</div>
+                </div>
+
+                <!-- Query Section -->
+                <section class="query-section">
+                    <form id="queryForm" class="query-form">
+                        <div class="input-wrapper">
+                            <input type="text" id="queryInput" placeholder="Ask the Oracle about your documents..."
+                                autocomplete="off" autofocus>
+                            <button type="submit" id="queryBtn" class="btn btn-primary">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <line x1="22" y1="2" x2="11" y2="13" />
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                </svg>
+                            </button>
+                        </div>
+                    </form>
+                    <div id="queryRewriteHint" class="query-rewrite-hint hidden"></div>
+
+                    <!-- Suggestion Chips -->
+                    <div id="suggestionChips" class="suggestion-chips">
+                        <button class="suggestion-chip" data-query="What topics are covered in my documents?">
+                            <span class="chip-icon">◈</span> What topics are covered?
+                        </button>
+                        <button class="suggestion-chip" data-query="Summarize the key concepts in my docs">
+                            <span class="chip-icon">✦</span> Summarize key concepts
+                        </button>
+                        <button class="suggestion-chip" data-query="What are the main findings or conclusions?">
+                            <span class="chip-icon">◇</span> Main findings
+                        </button>
+                        <button class="suggestion-chip" data-query="How does the system described in the docs work?">
+                            <span class="chip-icon">⬡</span> How does it work?
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Response Section -->
+                <section id="responseSection" class="response-section hidden">
+                    <div class="response-card">
+                        <!-- Copy Button -->
+                        <button id="copyBtn" class="copy-btn" title="Copy answer">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                            </svg>
+                            <span id="copyBtnText">Copy</span>
+                        </button>
+
+                        <!-- Confidence Bar -->
+                        <div id="confidenceBar" class="confidence-bar">
+                            <div class="confidence-label">
+                                <span>Confidence</span>
+                                <span id="confidenceScore">0%</span>
+                            </div>
+                            <div class="confidence-track">
+                                <div id="confidenceFill" class="confidence-fill"></div>
+                            </div>
+                        </div>
+
+                        <!-- Answer -->
+                        <div id="answerContent" class="answer-content"></div>
+
+                        <!-- Citations -->
+                        <div id="citationsSection" class="citations-section hidden">
+                            <h3 class="citations-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                </svg>
+                                Source Citations
+                            </h3>
+                            <div id="citationsList" class="citations-list"></div>
+                        </div>
+
+                        <!-- Metrics Panel -->
+                        <div id="requestMetrics" class="request-metrics">
+                            <div class="metric-chip">
+                                <span class="metric-label">Latency</span>
+                                <span id="metricLatency" class="metric-value">—</span>
+                            </div>
+                            <div class="metric-chip">
+                                <span class="metric-label">Tokens</span>
+                                <span id="metricTokens" class="metric-value">—</span>
+                            </div>
+                            <div class="metric-chip">
+                                <span class="metric-label">Chunks</span>
+                                <span id="metricChunks" class="metric-value">—</span>
+                            </div>
+                            <div class="metric-chip">
+                                <span class="metric-label">Grounded</span>
+                                <span id="metricGrounded" class="metric-value">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Loading (Skeleton) -->
+                <section id="loadingSection" class="loading-section hidden">
+                    <div class="loading-card">
+                        <div class="skeleton-container">
+                            <div class="skeleton-header">
+                                <div class="skeleton-avatar"></div>
+                                <div style="flex:1; display:flex; flex-direction:column; gap:0.5rem;">
+                                    <div class="skeleton-title"></div>
+                                    <div class="skeleton-line w-40"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-line w-90"></div>
+                            <div class="skeleton-line w-80"></div>
+                            <div class="skeleton-line w-60"></div>
+                            <div class="skeleton-line w-70"></div>
+                        </div>
+                        <div class="loading-steps">
+                            <div id="step1" class="loading-step">
+                                <span class="step-icon">◈</span> Querying the Oracle (vector + BM25)...
+                            </div>
+                            <div id="step2" class="loading-step">
+                                <span class="step-icon">◇</span> Cross-encoder re-ranking...
+                            </div>
+                            <div id="step3" class="loading-step">
+                                <span class="step-icon">✦</span> Decoding ancient knowledge...
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Ingest Section -->
+                <section class="ingest-section">
+                    <details class="ingest-details" open>
+                        <summary class="ingest-summary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                            Archive Documents
+                        </summary>
+
+                        <!-- File Upload Area -->
+                        <div id="uploadArea" class="upload-area">
+                            <div class="upload-icon">
+                                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="1.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                    <polyline points="17 8 12 3 7 8" />
+                                    <line x1="12" y1="3" x2="12" y2="15" />
+                                </svg>
+                            </div>
+                            <p class="upload-text">Drag & drop files here or <label for="fileInput"
+                                    class="upload-link">browse</label></p>
+                            <p class="upload-hint">Supports PDF, Markdown (.md), and Text files</p>
+                            <input type="file" id="fileInput" multiple accept=".pdf,.md,.markdown,.txt" hidden>
+                        </div>
+
+                        <!-- Uploaded Files List -->
+                        <div id="uploadedFiles" class="uploaded-files hidden"></div>
+                        <div id="uploadResult" class="ingest-result hidden"></div>
+
+                        <div class="ingest-divider">
+                            <span>or ingest from server path</span>
+                        </div>
+
+                        <form id="ingestForm" class="ingest-form">
+                            <input type="text" id="ingestPath"
+                                placeholder="Path to file or directory (e.g., ./data/documents)">
+                            <button type="submit" class="btn btn-secondary">Ingest</button>
+                        </form>
+                        <div id="ingestResult" class="ingest-result hidden"></div>
+                    </details>
+                </section>
+            </main>
+
+            <!-- Metrics Modal -->
+            <div id="metricsModal" class="modal hidden">
+                <div class="modal-overlay"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Pipeline Metrics Dashboard</h2>
+                        <button id="closeModal" class="btn btn-ghost btn-icon">&times;</button>
+                    </div>
+                    <div id="metricsGrid" class="metrics-grid">
+                        <p class="loading-text">Loading metrics...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL — Neural Retrieval Map -->
+        <aside class="panel panel-right" id="neuralPanel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span class="panel-glyph">⬡</span>
+                    <span>NEURAL MAP</span>
+                </div>
+                <span class="panel-badge" id="neuralStatus">IDLE</span>
+            </div>
+            <div class="neural-map-container">
+                <canvas id="neuralCanvas" width="300" height="500"></canvas>
+                <div class="neural-legend" id="neuralLegend">
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #06b6d4;"></span>
+                        <span>Query</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #10b981;"></span>
+                        <span>Retrieved</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: rgba(255,255,255,0.15);"></span>
+                        <span>Inactive</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="/static/app.js?v=3"></script>
+</body>
+
+</html>

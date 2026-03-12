@@ -1,0 +1,1991 @@
+/* ===================================
+   THE ORACLE — Cinematic RAG System
+   Dark emerald, mystical terminal,
+   HUD panels, living knowledge UI
+   =================================== */
+
+/* Reset & Base */
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Oracle Color Palette — Emerald */
+    --bg-void: #030a06;
+    --bg-primary: #050d08;
+    --bg-secondary: #081a10;
+    --bg-card: rgba(8, 26, 16, 0.85);
+    --bg-glass: rgba(16, 185, 129, 0.03);
+
+    --text-primary: #e2f0e8;
+    --text-secondary: #7eb89a;
+    --text-muted: #4a7a60;
+
+    --accent-primary: #10b981;
+    --accent-primary-light: #34d399;
+    --accent-glow: rgba(16, 185, 129, 0.3);
+    --accent-deep: #059669;
+    --accent-green: #10b981;
+    --accent-green-glow: rgba(16, 185, 129, 0.3);
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-cyan: #06b6d4;
+
+    --border: rgba(16, 185, 129, 0.08);
+    --border-hover: rgba(16, 185, 129, 0.2);
+    --border-active: rgba(16, 185, 129, 0.4);
+
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --shadow-glow: 0 0 40px var(--accent-glow);
+    --shadow-glow-sm: 0 0 20px rgba(16, 185, 129, 0.15);
+
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --font-display: 'Cinzel', serif;
+    --font-elegant: 'Cormorant Garamond', serif;
+
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-ambient: 3s ease-in-out;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg-void);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+/* ===== Ambient Background — Deep Oracle Glow ===== */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(16, 185, 129, 0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 20% 100%, rgba(16, 185, 129, 0.04) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 50% at 85% 80%, rgba(5, 150, 105, 0.03) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Scanline overlay for Oracle feel */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg,
+            transparent,
+            transparent 2px,
+            rgba(16, 185, 129, 0.008) 2px,
+            rgba(16, 185, 129, 0.008) 4px);
+    pointer-events: none;
+    z-index: 9999;
+    animation: scanlineScroll 8s linear infinite;
+}
+
+@keyframes scanlineScroll {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(4px);
+    }
+}
+
+/* ===== Particle Canvas ===== */
+#particleCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* ===== Custom Scrollbar ===== */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-void);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.2);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(16, 185, 129, 0.35);
+}
+
+/* ===== App Container ===== */
+.app {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
+    max-width: 920px;
+    padding: 0 1.5rem;
+    animation: oracleEnter 0.8s ease-out;
+}
+
+@keyframes oracleEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* ===== Header — Cinematic Oracle ===== */
+.header {
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+    position: relative;
+}
+
+/* Glow line under header */
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    opacity: 0.3;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.logo-icon {
+    width: 46px;
+    height: 46px;
+    background: linear-gradient(135deg, var(--accent-deep), var(--accent-primary-light));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: var(--shadow-glow-sm), 0 0 60px rgba(16, 185, 129, 0.1);
+    animation: logoPulse 4s ease-in-out infinite;
+    position: relative;
+}
+
+.logo-icon::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    animation: logoPulse 4s ease-in-out infinite reverse;
+}
+
+@keyframes logoPulse {
+
+    0%,
+    100% {
+        box-shadow: var(--shadow-glow-sm), 0 0 30px rgba(16, 185, 129, 0.08);
+    }
+
+    50% {
+        box-shadow: var(--shadow-glow), 0 0 60px rgba(16, 185, 129, 0.15);
+    }
+}
+
+.logo h1 {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--text-primary), var(--accent-primary-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.subtitle {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-family: var(--font-sans);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition: var(--transition-base);
+}
+
+.status-dot.active {
+    background: var(--accent-green);
+    box-shadow: 0 0 8px var(--accent-green-glow), 0 0 20px rgba(16, 185, 129, 0.15);
+    animation: oraclePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes oraclePulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 8px var(--accent-green-glow);
+    }
+
+    50% {
+        opacity: 0.5;
+        box-shadow: 0 0 20px var(--accent-green-glow);
+    }
+}
+
+/* ===== Buttons ===== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-glass);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn:hover {
+    border-color: var(--border-hover);
+    background: rgba(16, 185, 129, 0.06);
+    box-shadow: var(--shadow-glow-sm);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-deep), var(--accent-primary));
+    border-color: var(--accent-primary);
+    color: white;
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-primary-light));
+    border-color: var(--accent-primary-light);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.25);
+    color: var(--accent-primary-light);
+}
+
+.btn-secondary:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.btn-ghost {
+    border: none;
+    background: none;
+}
+
+.btn-ghost:hover {
+    background: rgba(16, 185, 129, 0.06);
+}
+
+.btn-icon {
+    padding: 0.4rem;
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+/* ===== Query Input — Oracle Terminal ===== */
+.query-section {
+    margin-bottom: 2rem;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(16px);
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated glow border effect */
+.input-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: conic-gradient(from 0deg,
+            transparent 0%,
+            rgba(16, 185, 129, 0.3) 25%,
+            transparent 50%,
+            rgba(16, 185, 129, 0.15) 75%,
+            transparent 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.5s;
+    animation: borderRotate 6s linear infinite;
+}
+
+.input-wrapper:focus-within::before {
+    opacity: 1;
+}
+
+@keyframes borderRotate {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+.input-wrapper:focus-within {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-glow), 0 0 40px rgba(16, 185, 129, 0.08);
+}
+
+#queryInput {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    outline: none;
+}
+
+#queryInput::placeholder {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ===== Oracle Welcome ===== */
+.oracle-welcome {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    animation: fadeGlowIn 1.2s ease-out 0.3s both;
+}
+
+.oracle-welcome .welcome-glyph {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.4));
+}
+
+.oracle-welcome .welcome-title {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent-primary);
+    opacity: 0.7;
+    margin-bottom: 0.3rem;
+}
+
+.oracle-welcome .welcome-sub {
+    font-family: var(--font-elegant);
+    font-size: 1.1rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+@keyframes fadeGlowIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+        filter: blur(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        filter: blur(0);
+    }
+}
+
+/* ===== Query Suggestion Chips — Glowing Pills ===== */
+.suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    justify-content: center;
+    animation: fadeGlowIn 0.6s ease-out 0.5s both;
+}
+
+.suggestion-chips.hidden {
+    display: none !important;
+}
+
+.suggestion-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: rgba(16, 185, 129, 0.04);
+    border: 1px solid rgba(16, 185, 129, 0.12);
+    border-radius: 100px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-family: var(--font-sans);
+    position: relative;
+    overflow: hidden;
+}
+
+.suggestion-chip::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.suggestion-chip:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary-light);
+    background: rgba(16, 185, 129, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.12), 0 0 30px rgba(16, 185, 129, 0.06);
+}
+
+.suggestion-chip:hover::before {
+    opacity: 1;
+}
+
+.suggestion-chip .chip-icon {
+    font-size: 0.85rem;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== Response — Glassmorphic Oracle Panel ===== */
+.response-section {
+    margin-bottom: 2rem;
+    animation: panelReveal 0.5s ease-out;
+}
+
+@keyframes panelReveal {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+        filter: blur(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.response-card {
+    position: relative;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.75rem;
+    backdrop-filter: blur(16px);
+    box-shadow: 0 0 60px rgba(16, 185, 129, 0.03), var(--shadow-md);
+}
+
+/* Corner HUD indicators on response card */
+.response-card::before,
+.response-card::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    pointer-events: none;
+}
+
+.response-card::before {
+    top: -1px;
+    left: -1px;
+    border-right: none;
+    border-bottom: none;
+    border-radius: var(--radius-lg) 0 0 0;
+}
+
+.response-card::after {
+    bottom: -1px;
+    right: -1px;
+    border-left: none;
+    border-top: none;
+    border-radius: 0 0 var(--radius-lg) 0;
+}
+
+/* Copy Button */
+.copy-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    background: rgba(16, 185, 129, 0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    z-index: 5;
+}
+
+.copy-btn:hover {
+    border-color: var(--accent-primary);
+    color: var(--accent-primary-light);
+    background: rgba(16, 185, 129, 0.08);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
+.copy-btn.copied {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+/* Confidence Bar — Oracle Energy Bar */
+.confidence-bar {
+    margin-bottom: 1.25rem;
+}
+
+.confidence-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.4rem;
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.confidence-track {
+    height: 4px;
+    background: rgba(16, 185, 129, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.confidence-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--accent-green);
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    position: relative;
+}
+
+.confidence-fill::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -2px;
+    bottom: -2px;
+    width: 4px;
+    background: var(--accent-primary-light);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.confidence-fill.low {
+    background: var(--accent-red);
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.confidence-fill.low::after {
+    background: #f87171;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+.confidence-fill.medium {
+    background: var(--accent-amber);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.confidence-fill.medium::after {
+    background: #fbbf24;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+.confidence-fill.high {
+    background: var(--accent-green);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+/* Answer Content — Oracle Scripture */
+.answer-content {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    padding-right: 60px;
+}
+
+.answer-content.ungrounded {
+    color: var(--accent-amber);
+    padding: 1rem;
+    background: rgba(245, 158, 11, 0.04);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--accent-amber);
+}
+
+/* Markdown rendered content */
+.answer-content h1,
+.answer-content h2,
+.answer-content h3,
+.answer-content h4 {
+    margin: 1rem 0 0.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--accent-primary-light);
+}
+
+.answer-content h1 {
+    font-size: 1.3rem;
+}
+
+.answer-content h2 {
+    font-size: 1.15rem;
+}
+
+.answer-content h3 {
+    font-size: 1.05rem;
+}
+
+.answer-content p {
+    margin-bottom: 0.75rem;
+}
+
+.answer-content ul,
+.answer-content ol {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.answer-content li {
+    margin-bottom: 0.3rem;
+}
+
+.answer-content code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 0.15rem 0.4rem;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.12);
+    border-radius: 4px;
+    color: var(--accent-primary-light);
+}
+
+.answer-content pre {
+    margin: 0.75rem 0;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+    position: relative;
+}
+
+.answer-content pre::before {
+    content: '>';
+    position: absolute;
+    top: 1rem;
+    left: 0.5rem;
+    color: var(--accent-primary);
+    opacity: 0.3;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+}
+
+.answer-content pre code {
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.answer-content blockquote {
+    margin: 0.75rem 0;
+    padding: 0.75rem 1rem;
+    border-left: 3px solid var(--accent-primary);
+    background: rgba(16, 185, 129, 0.03);
+    color: var(--text-secondary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-style: italic;
+}
+
+.answer-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    font-size: 0.85rem;
+}
+
+.answer-content th,
+.answer-content td {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    text-align: left;
+}
+
+.answer-content th {
+    background: rgba(16, 185, 129, 0.06);
+    font-weight: 600;
+    color: var(--accent-primary-light);
+}
+
+.answer-content strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Streaming cursor — Oracle blink */
+.streaming-cursor {
+    display: inline-block;
+    color: var(--accent-primary-light);
+    animation: oracleBlink 0.6s step-end infinite;
+    font-weight: 300;
+    margin-left: 1px;
+    text-shadow: 0 0 8px var(--accent-glow);
+}
+
+@keyframes oracleBlink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* ===== Citations — HUD Panels ===== */
+.citations-section {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border);
+    position: relative;
+}
+
+.citations-section::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.2), transparent);
+}
+
+.citations-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: var(--font-mono);
+}
+
+.citations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.citation-card {
+    padding: 0.75rem 1rem;
+    background: rgba(16, 185, 129, 0.02);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Radar sweep on hover */
+.citation-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.06), transparent);
+    transition: left 0.5s ease-out;
+}
+
+.citation-card:hover::before {
+    left: 100%;
+}
+
+.citation-card:hover {
+    border-color: var(--accent-primary);
+    background: rgba(16, 185, 129, 0.05);
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.06);
+}
+
+.citation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.citation-source {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent-primary-light);
+    font-family: var(--font-mono);
+}
+
+.citation-score {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.citation-text {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    display: none;
+}
+
+.citation-card.expanded .citation-text {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* ===== Request Metrics — Mission Control Readouts ===== */
+.request-metrics {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+.metric-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(16, 185, 129, 0.03);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(16, 185, 129, 0.06);
+    transition: var(--transition-fast);
+}
+
+.metric-chip:hover {
+    border-color: rgba(16, 185, 129, 0.15);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.metric-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.metric-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--accent-primary-light);
+}
+
+/* ===== Skeleton Loading — Oracle Decoding ===== */
+.loading-section {
+    margin-bottom: 2rem;
+}
+
+.loading-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    backdrop-filter: blur(16px);
+    animation: loadingPulseCard 2s ease-in-out infinite;
+}
+
+@keyframes loadingPulseCard {
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.03);
+    }
+
+    50% {
+        box-shadow: 0 0 40px rgba(16, 185, 129, 0.08);
+    }
+}
+
+.skeleton-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.04) 25%, rgba(16, 185, 129, 0.1) 50%, rgba(16, 185, 129, 0.04) 75%);
+    background-size: 200% 100%;
+    animation: oracleShimmer 1.8s ease-in-out infinite;
+}
+
+.skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.04) 25%, rgba(16, 185, 129, 0.1) 50%, rgba(16, 185, 129, 0.04) 75%);
+    background-size: 200% 100%;
+    animation: oracleShimmer 1.8s ease-in-out infinite;
+}
+
+.skeleton-line.w-80 {
+    width: 80%;
+}
+
+.skeleton-line.w-60 {
+    width: 60%;
+}
+
+.skeleton-line.w-90 {
+    width: 90%;
+}
+
+.skeleton-line.w-40 {
+    width: 40%;
+}
+
+.skeleton-line.w-70 {
+    width: 70%;
+}
+
+.skeleton-title {
+    height: 16px;
+    width: 50%;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.04) 25%, rgba(16, 185, 129, 0.1) 50%, rgba(16, 185, 129, 0.04) 75%);
+    background-size: 200% 100%;
+    animation: oracleShimmer 1.8s ease-in-out infinite;
+}
+
+@keyframes oracleShimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.loading-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.loading-step {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+}
+
+.loading-step.active {
+    color: var(--accent-primary-light);
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+
+.loading-step.done {
+    color: var(--accent-green);
+}
+
+/* ===== Ingest — Oracle Archive ===== */
+.ingest-section {
+    margin-bottom: 3rem;
+}
+
+.ingest-details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(16px);
+}
+
+.ingest-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    list-style: none;
+    transition: var(--transition-fast);
+    font-family: var(--font-mono);
+    letter-spacing: 0.03em;
+}
+
+.ingest-summary:hover {
+    color: var(--accent-primary-light);
+}
+
+.ingest-summary::-webkit-details-marker {
+    display: none;
+}
+
+.ingest-form {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 1rem 1rem;
+}
+
+.ingest-form input {
+    flex: 1;
+    padding: 0.6rem 0.75rem;
+    background: rgba(16, 185, 129, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    outline: none;
+    transition: var(--transition-fast);
+}
+
+.ingest-form input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.12);
+}
+
+.ingest-result {
+    margin: 0 1rem 1rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-family: var(--font-mono);
+}
+
+.ingest-result.success {
+    background: rgba(16, 185, 129, 0.06);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+}
+
+.ingest-result.error {
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--accent-red);
+}
+
+/* ===== Modal — Oracle Vision ===== */
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 10, 6, 0.85);
+    backdrop-filter: blur(8px);
+}
+
+.modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: 0 0 80px rgba(16, 185, 129, 0.08), var(--shadow-lg);
+    animation: modalOracle 0.4s ease-out;
+}
+
+@keyframes modalOracle {
+    from {
+        opacity: 0;
+        transform: scale(0.92) translateY(10px);
+        filter: blur(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-display);
+    letter-spacing: 0.05em;
+    color: var(--accent-primary-light);
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.metrics-card {
+    padding: 1rem;
+    background: rgba(16, 185, 129, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    transition: var(--transition-fast);
+    position: relative;
+}
+
+.metrics-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.metrics-card:hover {
+    border-color: var(--border-hover);
+    background: rgba(16, 185, 129, 0.06);
+}
+
+.metrics-card:hover::before {
+    opacity: 0.5;
+}
+
+.metrics-card h3 {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-family: var(--font-mono);
+}
+
+.metrics-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--accent-primary-light);
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.metrics-card .sub-value {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+    font-family: var(--font-mono);
+}
+
+/* ===== Toast Notifications — Oracle Whisper ===== */
+.toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 9998;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.05);
+    pointer-events: auto;
+    animation: toastOracle 0.4s ease-out;
+    backdrop-filter: blur(16px);
+    max-width: 380px;
+}
+
+.toast.toast-exit {
+    animation: toastOut 0.3s ease-in forwards;
+}
+
+.toast-icon {
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.toast.success {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.toast.error {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.toast.info {
+    border-color: rgba(6, 182, 212, 0.3);
+}
+
+@keyframes toastOracle {
+    from {
+        opacity: 0;
+        transform: translateX(40px) scale(0.95);
+        filter: blur(2px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes toastOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(40px) scale(0.95);
+    }
+}
+
+/* ===== Keyboard shortcut badge ===== */
+.kbd-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-left: 0.5rem;
+}
+
+.kbd-hint kbd {
+    display: inline-block;
+    padding: 0.1rem 0.35rem;
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-family: var(--font-sans);
+    font-size: 0.6rem;
+    line-height: 1.4;
+}
+
+/* Utility */
+.hidden {
+    display: none !important;
+}
+
+.loading-text {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-family: var(--font-mono);
+}
+
+/* ===== Upload area — Oracle Archive Portal ===== */
+.upload-area {
+    margin: 0 1rem;
+    padding: 1.75rem;
+    border: 2px dashed rgba(16, 185, 129, 0.15);
+    border-radius: var(--radius-md);
+    text-align: center;
+    transition: all var(--transition-base);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Breathing glow */
+.upload-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.04), transparent 70%);
+    animation: breathe 4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.upload-area:hover,
+.upload-area.dragover {
+    border-color: var(--accent-primary);
+    background: rgba(16, 185, 129, 0.04);
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.06);
+}
+
+.upload-icon {
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    position: relative;
+}
+
+.upload-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+    position: relative;
+}
+
+.upload-link {
+    color: var(--accent-primary-light);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.upload-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    position: relative;
+}
+
+.uploaded-files {
+    margin: 0.75rem 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.ingest-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+}
+
+.ingest-divider::before,
+.ingest-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+/* ===== Corner HUD Elements ===== */
+.corner-hud {
+    position: fixed;
+    font-size: 0.5rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(16, 185, 129, 0.15);
+    font-family: var(--font-mono);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.corner-hud.top-left {
+    top: 1rem;
+    left: 1rem;
+}
+
+.corner-hud.top-right {
+    top: 1rem;
+    right: 1rem;
+}
+
+.corner-hud.bottom-left {
+    bottom: 1rem;
+    left: 1rem;
+}
+
+.corner-hud.bottom-right {
+    bottom: 1rem;
+    right: 1rem;
+}
+
+/* ===== 3-Column Mission Control Layout ===== */
+.mission-control {
+    display: flex;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+    gap: 0;
+}
+
+/* ===== Side Panels — Shared ===== */
+.panel {
+    width: 280px;
+    min-width: 280px;
+    background: rgba(5, 13, 8, 0.92);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    backdrop-filter: blur(16px);
+    animation: panelSlideIn 0.6s ease-out;
+}
+
+.panel-right {
+    border-right: none;
+    border-left: 1px solid var(--border);
+}
+
+@keyframes panelSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.panel-right {
+    animation-name: panelSlideInRight;
+}
+
+@keyframes panelSlideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+    position: relative;
+}
+
+.panel-header::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 15%;
+    right: 15%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.2), transparent);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.panel-glyph {
+    font-size: 0.9rem;
+    color: var(--accent-primary);
+    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.4));
+}
+
+.panel-badge {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    border-radius: 100px;
+    color: var(--accent-primary);
+    letter-spacing: 0.05em;
+}
+
+/* ===== Left Panel — Corpus ===== */
+.corpus-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.corpus-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    text-align: center;
+}
+
+.corpus-empty-icon {
+    font-size: 1.5rem;
+    opacity: 0.4;
+}
+
+.corpus-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    transition: all 0.4s ease;
+    cursor: default;
+    margin-bottom: 0.25rem;
+}
+
+.corpus-item .doc-name {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.corpus-item .doc-icon {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.corpus-item .doc-chunks {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+}
+
+/* Relevance bar container */
+.corpus-item .relevance-bar {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 0.15rem;
+}
+
+.corpus-item .relevance-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+    background: rgba(6, 182, 212, 0.5);
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cited / active state — cyan highlight */
+.corpus-item.cited {
+    border-color: rgba(6, 182, 212, 0.3);
+    background: rgba(6, 182, 212, 0.06);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.06), inset 0 0 20px rgba(6, 182, 212, 0.03);
+    animation: citedPulse 2s ease-in-out;
+}
+
+.corpus-item.cited .doc-name {
+    color: #22d3ee;
+    text-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+}
+
+.corpus-item.cited .doc-chunks {
+    color: rgba(6, 182, 212, 0.7);
+}
+
+.corpus-item.cited .relevance-fill {
+    background: linear-gradient(90deg, rgba(6, 182, 212, 0.8), rgba(34, 211, 238, 1));
+    box-shadow: 0 0 6px rgba(6, 182, 212, 0.5);
+}
+
+@keyframes citedPulse {
+    0% {
+        border-color: rgba(6, 182, 212, 0.1);
+        background: transparent;
+    }
+
+    30% {
+        border-color: rgba(6, 182, 212, 0.5);
+        background: rgba(6, 182, 212, 0.1);
+    }
+
+    100% {
+        border-color: rgba(6, 182, 212, 0.3);
+        background: rgba(6, 182, 212, 0.06);
+    }
+}
+
+/* ===== Right Panel — Neural Retrieval Map ===== */
+.neural-map-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#neuralCanvas {
+    flex: 1;
+    width: 100%;
+    cursor: default;
+}
+
+.neural-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1200px) {
+    .panel {
+        width: 220px;
+        min-width: 220px;
+    }
+}
+
+@media (max-width: 900px) {
+    .mission-control {
+        flex-direction: column;
+    }
+
+    .panel {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        max-height: 250px;
+        position: relative;
+        border-right: none;
+        border-left: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .panel-right {
+        border-bottom: none;
+        border-top: 1px solid var(--border);
+    }
+
+    .corpus-list {
+        max-height: 150px;
+    }
+
+    #neuralCanvas {
+        max-height: 200px;
+    }
+}
+
+@media (max-width: 640px) {
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .request-metrics {
+        flex-direction: column;
+    }
+
+    .metrics-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .suggestion-chips {
+        justify-content: center;
+    }
+
+    .toast-container {
+        left: 1rem;
+        right: 1rem;
+    }
+
+    .toast {
+        max-width: 100%;
+    }
+
+    .corner-hud {
+        display: none;
+    }
+
+    .oracle-welcome .welcome-title {
+        font-size: 0.7rem;
+    }
+
+    .panel {
+        display: none;
+    }
+}
+
+/* ===== Feedback Buttons — Oracle Judgment ===== */
+.feedback-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.feedback-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-right: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+}
+
+.feedback-btn {
+    background: rgba(16, 185, 129, 0.04);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.75rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    line-height: 1;
+}
+
+.feedback-btn:hover:not(:disabled) {
+    border-color: var(--accent-primary);
+    background: rgba(16, 185, 129, 0.1);
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+}
+
+.feedback-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.feedback-btn.positive.selected {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--accent-green);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.15);
+}
+
+.feedback-btn.negative.selected {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: var(--accent-red);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.15);
+}
+
+.feedback-status {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    margin-left: 0.5rem;
+    font-family: var(--font-mono);
+}
+
+.feedback-status.visible {
+    opacity: 1;
+}
+
+/* ===== Query Rewrite Hint ===== */
+.query-rewrite-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-top: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    background: rgba(16, 185, 129, 0.04);
+    border-radius: var(--radius-sm);
+    border-left: 2px solid var(--accent-primary);
+}
