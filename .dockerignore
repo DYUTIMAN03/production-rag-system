@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual env
+venv/
+.venv/
+env/
+
+# Environment Variables (so API keys aren't baked into the image)
+.env
+.env.local
+
+# Existing local DBs
+chroma_db/
+*.pkl
+feedback.db
+
+# Cache
+.cache/
+.pytest_cache/
+.vscode/
+.idea/
+.gemini/
+.agents/
+langfuse_data/
+postgres_data/
+clickhouse_data/
+
+# OS
+.DS_Store
+Thumbs.db
