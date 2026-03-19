@@ -38,12 +38,8 @@ bm25.build_index(store.get_all_chunks()); \
 bm25.save_index(); \
 print(f'Ingested {len(docs)} documents -> {len(chunks)} chunks')"
 
-# Expose the API port
-EXPOSE 8000
-
 # Set environment variables for production
 ENV HOST=0.0.0.0
-ENV PORT=8000
 
-# Run FastAPI server
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run FastAPI server using Render's dynamic PORT
+CMD ["sh", "-c", "uvicorn src.api.main:app --host 0.0.0.0 --port ${PORT:-10000}"]
