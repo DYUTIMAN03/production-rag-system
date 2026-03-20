@@ -1,8 +1,9 @@
 """
 FastAPI Application — Production RAG System with Full Observability.
 
-Uses background thread for heavy model loading so uvicorn binds
-the port immediately (required for Render's free-tier port scan).
+ALL heavy imports (torch, sentence-transformers, chromadb, etc.) are
+deferred to a background thread so uvicorn can bind the port instantly.
+This is required for Render's free-tier port scan (512 MB RAM limit).
 """
 
 import os
@@ -22,21 +23,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspa
 from dotenv import load_dotenv
 load_dotenv()
 
-from src.api.feedback import FeedbackStore
-from src.api.routes import router, set_dependencies
-from src.generation.llm import GroqLLM
-from src.generation.prompt_manager import PromptManager
-from src.generation.query_rewriter import QueryRewriter
-from src.generation.rag_pipeline import RAGPipeline
-from src.ingestion.chunker import TokenAwareChunker
-from src.observability.metrics import MetricsCollector
-from src.observability.tracer import LangfuseTracer
-from src.retrieval.bm25_search import BM25Search
-from src.retrieval.hybrid import HybridRetriever
-from src.retrieval.reranker import Reranker
-from src.retrieval.vector_store import VectorStore
+# ── lightweight imports only (no torch / transformers / chromadb) ──
+# Heavy src.* modules are imported lazily inside _load_models_in_background()
 
-# Global flag so /api/health can report readiness
+# Global flag so /healthz can report readiness
 _models_ready = False
 
 
@@ -51,13 +41,32 @@ def load_config():
 
 
 def _load_models_in_background():
-    """Heavy model loading runs in a separate thread so the port binds instantly."""
+    """
+    Heavy model loading runs in a separate thread so the port binds instantly.
+    ALL imports that pull in torch / sentence-transformers / chromadb live here.
+    """
     global _models_ready
 
     config = load_config()
-    print("\n[*] Loading RAG models in background thread...")
+    print("\n[*] Loading RAG models in background thread...", flush=True)
 
     try:
+        # ── lazy imports ──────────────────────────────────────────
+        from src.api.feedback import FeedbackStore
+        from src.api.routes import set_dependencies
+        from src.generation.llm import GroqLLM
+        from src.generation.prompt_manager import PromptManager
+        from src.generation.query_rewriter import QueryRewriter
+        from src.generation.rag_pipeline import RAGPipeline
+        from src.ingestion.chunker import TokenAwareChunker
+        from src.observability.metrics import MetricsCollector
+        from src.observability.tracer import LangfuseTracer
+        from src.retrieval.bm25_search import BM25Search
+        from src.retrieval.hybrid import HybridRetriever
+        from src.retrieval.reranker import Reranker
+        from src.retrieval.vector_store import VectorStore
+        # ──────────────────────────────────────────────────────────
+
         # Vector Store
         vs_config = config.get("vector_store", {})
         vector_store = VectorStore(
@@ -65,19 +74,19 @@ def _load_models_in_background():
             collection_name=vs_config.get("collection_name", "rag_documents"),
             embedding_model=config.get("embedding", {}).get("model", "all-MiniLM-L6-v2"),
         )
-        print(f"  [+] Vector store initialized ({vector_store.count()} chunks)")
+        print(f"  [+] Vector store initialized ({vector_store.count()} chunks)", flush=True)
 
         # BM25 Search
         bm25 = BM25Search()
         if bm25.load_index():
-            print(f"  [+] BM25 index loaded ({len(bm25.chunk_data)} chunks)")
+            print(f"  [+] BM25 index loaded ({len(bm25.chunk_data)} chunks)", flush=True)
         else:
             chunks = vector_store.get_all_chunks()
             if chunks:
                 bm25.build_index(chunks)
-                print(f"  [+] BM25 index built ({len(chunks)} chunks)")
+                print(f"  [+] BM25 index built ({len(chunks)} chunks)", flush=True)
             else:
-                print("  [!] BM25 index empty -- ingest documents first")
+                print("  [!] BM25 index empty -- ingest documents first", flush=True)
 
         # Hybrid Retriever
         ret_config = config.get("retrieval", {})
@@ -91,7 +100,7 @@ def _load_models_in_background():
         reranker = Reranker(
             model_name=config.get("reranker", {}).get("model", "cross-encoder/ms-marco-MiniLM-L6-v2"),
         )
-        print("  [+] Cross-encoder reranker loaded")
+        print("  [+] Cross-encoder reranker loaded", flush=True)
 
         # LLM
         llm_config = config.get("llm", {})
@@ -100,16 +109,16 @@ def _load_models_in_background():
             temperature=llm_config.get("temperature", 0.1),
             max_output_tokens=llm_config.get("max_output_tokens", 1024),
         )
-        print(f"  [+] LLM client initialized ({llm_config.get('model', 'llama-3.3-70b-versatile')})")
+        print(f"  [+] LLM client initialized ({llm_config.get('model', 'llama-3.3-70b-versatile')})", flush=True)
 
         # Prompt Manager
         prompt_manager = PromptManager()
         versions = prompt_manager.get_all_versions()
-        print(f"  [+] Prompts loaded (versions: {versions})")
+        print(f"  [+] Prompts loaded (versions: {versions})", flush=True)
 
         # Query Rewriter
         query_rewriter = QueryRewriter(llm=llm, prompt_manager=prompt_manager)
-        print("  [+] Query rewriter initialized")
+        print("  [+] Query rewriter initialized", flush=True)
 
         # RAG Pipeline
         pipeline = RAGPipeline(
@@ -138,16 +147,16 @@ def _load_models_in_background():
 
         # Feedback Store
         feedback_store = FeedbackStore()
-        print("  [+] Feedback store initialized")
+        print("  [+] Feedback store initialized", flush=True)
 
         # Set dependencies for routes
         set_dependencies(pipeline, vector_store, bm25, metrics_collector, tracer, chunker, feedback_store)
 
         _models_ready = True
-        print("\n[OK] RAG System fully loaded and ready!\n")
+        print("\n[OK] RAG System fully loaded and ready!\n", flush=True)
 
     except Exception as e:
-        print(f"\n[ERROR] Failed to load models: {e}")
+        print(f"\n[ERROR] Failed to load models: {e}", flush=True)
         import traceback
         traceback.print_exc()
 
@@ -158,7 +167,7 @@ async def lifespan(app: FastAPI):
     Start model loading in a background thread so uvicorn can bind
     the port immediately (Render requires an open port within ~5 min).
     """
-    print("[*] Starting uvicorn — models will load in background...")
+    print("[*] Starting uvicorn — models will load in background...", flush=True)
     loader_thread = threading.Thread(target=_load_models_in_background, daemon=True)
     loader_thread.start()
 
@@ -166,6 +175,11 @@ async def lifespan(app: FastAPI):
 
     print("\n[x] RAG System shutting down.")
 
+
+# ── Import router lazily to avoid pulling in heavy deps at import time ──
+# routes.py likely imports types from retrieval/generation modules.
+# We import it here but the actual heavy module loading happens in the thread.
+from src.api.routes import router  # noqa: E402
 
 # Create FastAPI app
 app = FastAPI(
@@ -221,3 +235,4 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("src.api.main:app", host="0.0.0.0", port=8000, reload=True)
+
